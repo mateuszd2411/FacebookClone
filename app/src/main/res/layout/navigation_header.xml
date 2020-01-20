@@ -26,7 +26,7 @@
         android:layout_below="@+id/nav_profile_image"
         android:layout_alignStart="@+id/nav_profile_image"
         android:layout_alignEnd="@+id/nav_profile_image"
-        
+
         android:text="username"
         android:textAlignment="center"
         android:textColor="@android:color/background_light"
