@@ -21,6 +21,9 @@ import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.storage.FirebaseStorage;
+import com.google.firebase.storage.StorageReference;
+import com.google.firebase.storage.UploadTask;
 import com.theartofdev.edmodo.cropper.CropImage;
 import com.theartofdev.edmodo.cropper.CropImageView;
 
@@ -36,9 +39,10 @@ public class SetupActivity extends AppCompatActivity {
     private ProgressDialog loadingBar;
 
     private FirebaseAuth mAuth;
-    private DatabaseReference UserRef;
+    private DatabaseReference UsersRef;
+    private StorageReference UserProfileImageRef;
 
-    String currentUseID;
+    String currentUserID;
     final static int Gallery_Pick = 1;
 
     @Override
@@ -50,8 +54,9 @@ public class SetupActivity extends AppCompatActivity {
 
 
         mAuth = FirebaseAuth.getInstance();
-        currentUseID = mAuth.getCurrentUser().getUid();
-        UserRef = FirebaseDatabase.getInstance().getReference().child("Users").child(currentUseID);
+        currentUserID = mAuth.getCurrentUser().getUid();
+        UsersRef = FirebaseDatabase.getInstance().getReference().child("Users").child(currentUserID);
+        UserProfileImageRef = FirebaseStorage.getInstance().getReference().child("Profile Images");
 
         UserName = (EditText) findViewById(R.id.setup_username);
         FullName = (EditText) findViewById(R.id.setup_full_name);
@@ -95,13 +100,55 @@ public class SetupActivity extends AppCompatActivity {
                     .start(this);
         }
         if (requestCode == CropImage.CROP_IMAGE_ACTIVITY_REQUEST_CODE) {
+            
             CropImage.ActivityResult result = CropImage.getActivityResult(data);
 
             if (resultCode == RESULT_OK) {
 
                 Uri resultUri = result.getUri();
 
+                StorageReference filePath = UserProfileImageRef.child(currentUserID + ".jpg");
+                
+                filePath.putFile(resultUri).addOnCompleteListener(new OnCompleteListener<UploadTask.TaskSnapshot>() {
+                    @Override
+                    public void onComplete(@NonNull Task<UploadTask.TaskSnapshot> task) {
+
+                        if (task.isSuccessful())
+                        {
+                            Toast.makeText(SetupActivity.this, "Profile Image stored successfully...", Toast.LENGTH_SHORT).show();
+
+                            final String downloadUrl = task.getResult().getStorage().getDownloadUrl().toString();
+
+                            UsersRef.child("profileimage").setValue(downloadUrl)
+                                    .addOnCompleteListener(new OnCompleteListener<Void>() {
+                                        @Override
+                                        public void onComplete(@NonNull Task<Void> task) {
+
+                                            if(task.isSuccessful())
+                                            {
+                                                Toast.makeText(SetupActivity.this, "Profile Image stored successfully to Firebase...", Toast.LENGTH_SHORT).show();
+                                                
+                                            }
+                                            else 
+                                            {
+                                                String message = task.getException().getMessage();
+                                                Toast.makeText(SetupActivity.this, "Error Occured: " + message, Toast.LENGTH_SHORT).show();
+                                            }
+
+                                        }
+                                    });
+
+
+                        }
+
+
+                        
+                    }
+                });
+                
+                
             }
+            
         }
     }
 
@@ -139,7 +186,7 @@ public class SetupActivity extends AppCompatActivity {
             userMap.put("gender" , "none");
             userMap.put("dob" , "none");
             userMap.put("relationshipstatus" , "none");
-            UserRef.updateChildren(userMap).addOnCompleteListener(new OnCompleteListener() {
+            UsersRef.updateChildren(userMap).addOnCompleteListener(new OnCompleteListener() {
                 @Override
                 public void onComplete(@NonNull Task task) {
 
