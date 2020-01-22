@@ -13,6 +13,7 @@ import android.os.Build;
 import android.os.Bundle;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.TextView;
 import android.widget.Toast;
 
 
@@ -24,6 +25,9 @@ import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
+import com.squareup.picasso.Picasso;
+
+import de.hdodenhof.circleimageview.CircleImageView;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -33,8 +37,13 @@ public class MainActivity extends AppCompatActivity {
     private RecyclerView postList;
     private Toolbar mToolbar;
 
+    private CircleImageView NavProfileImage;
+    private TextView NavProfilUsereName;
+
     private FirebaseAuth mAuth;
     private DatabaseReference UsersRef;
+
+    String currentUserID;
 
 
     @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
@@ -45,6 +54,7 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
 
         mAuth = FirebaseAuth.getInstance();
+        currentUserID = mAuth.getCurrentUser().getUid();
         UsersRef = FirebaseDatabase.getInstance().getReference().child("Users");
 
 
@@ -59,7 +69,31 @@ public class MainActivity extends AppCompatActivity {
         actionBarDrawerToggle.syncState();
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         navigationView =(NavigationView) findViewById(R.id.navigation_view);
+
         View navWiev = navigationView.inflateHeaderView(R.layout.navigation_header);
+        NavProfileImage = (CircleImageView) navWiev.findViewById(R.id.nav_profile_image);
+        NavProfilUsereName = (TextView) navWiev.findViewById(R.id.nav_user_full_name);
+
+
+
+        UsersRef.child(currentUserID).addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+
+                String fullname = dataSnapshot.child("fullname").getValue().toString();
+                String image = dataSnapshot.child("profileimage").getValue().toString();
+
+                NavProfilUsereName.setText(fullname);
+                Picasso.get().load(image).placeholder(R.drawable.profile).into(NavProfileImage);
+
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError) {
+
+            }
+        });
+
 
         navigationView.setNavigationItemSelectedListener(new NavigationView.OnNavigationItemSelectedListener() {
             @Override
