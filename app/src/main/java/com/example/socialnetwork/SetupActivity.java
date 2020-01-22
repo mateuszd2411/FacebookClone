@@ -105,6 +105,11 @@ public class SetupActivity extends AppCompatActivity {
 
             if (resultCode == RESULT_OK) {
 
+                loadingBar.setTitle("Profile Image");
+                loadingBar.setMessage("Please wait we are updating your profile image...");
+                loadingBar.show();
+                loadingBar.setCanceledOnTouchOutside(true);
+
                 Uri resultUri = result.getUri();
 
                 StorageReference filePath = UserProfileImageRef.child(currentUserID + ".jpg");
@@ -126,29 +131,32 @@ public class SetupActivity extends AppCompatActivity {
 
                                             if(task.isSuccessful())
                                             {
+                                                Intent selfIntent = new Intent(SetupActivity.this, SetupActivity.class);
+                                                startActivity(selfIntent);
+
                                                 Toast.makeText(SetupActivity.this, "Profile Image stored successfully to Firebase...", Toast.LENGTH_SHORT).show();
-                                                
+                                                loadingBar.dismiss();
                                             }
                                             else 
                                             {
                                                 String message = task.getException().getMessage();
                                                 Toast.makeText(SetupActivity.this, "Error Occured: " + message, Toast.LENGTH_SHORT).show();
+                                                loadingBar.dismiss();
                                             }
 
                                         }
                                     });
-
-
                         }
-
-
-                        
                     }
                 });
-                
-                
             }
-            
+
+            else
+            {
+                Toast.makeText(this, "Error Occured: Image can t be cropped. Try again.", Toast.LENGTH_SHORT).show();
+                loadingBar.dismiss();
+            }
+
         }
     }
 
