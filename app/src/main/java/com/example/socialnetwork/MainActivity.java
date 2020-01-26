@@ -6,6 +6,7 @@ import androidx.appcompat.app.ActionBarDrawerToggle;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 import androidx.drawerlayout.widget.DrawerLayout;
+import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import android.content.Intent;
@@ -74,9 +75,19 @@ public class MainActivity extends AppCompatActivity {
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         navigationView =(NavigationView) findViewById(R.id.navigation_view);
 
-        View navWiev = navigationView.inflateHeaderView(R.layout.navigation_header);
-        NavProfileImage = (CircleImageView) navWiev.findViewById(R.id.nav_profile_image);
-        NavProfilUsereName = (TextView) navWiev.findViewById(R.id.nav_user_full_name);
+
+        postList = (RecyclerView) findViewById(R.id.all_users_post_list);
+        postList.setHasFixedSize(true);
+        LinearLayoutManager linearLayoutManager = new LinearLayoutManager(this);
+        linearLayoutManager.setReverseLayout(true);
+        linearLayoutManager.setStackFromEnd(true);
+        postList.setLayoutManager(linearLayoutManager);
+
+
+        View navViev = navigationView.inflateHeaderView(R.layout.navigation_header);
+        NavProfileImage = (CircleImageView) navViev.findViewById(R.id.nav_profile_image);
+        NavProfilUsereName = (TextView) navViev.findViewById(R.id.nav_user_full_name);
+
 
 
 
@@ -133,6 +144,15 @@ public class MainActivity extends AppCompatActivity {
 
             }
         });
+
+
+        DisplayAllUserPosts();
+
+
+    }
+
+    private void DisplayAllUserPosts() {
+
 
 
     }
