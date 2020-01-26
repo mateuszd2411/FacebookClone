@@ -1,7 +1,6 @@
 package com.example.socialnetwork;
 
 import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.app.ProgressDialog;
@@ -33,14 +32,13 @@ import com.theartofdev.edmodo.cropper.CropImage;
 import com.theartofdev.edmodo.cropper.CropImageView;
 
 import java.util.HashMap;
-import java.util.Set;
 
 import de.hdodenhof.circleimageview.CircleImageView;
 
 public class SetupActivity extends AppCompatActivity {
 
     private EditText UserName, FullName, CountryName;
-    private Button SaveInformationbutton;
+    private Button SaveInformationbuttion;
     private CircleImageView ProfileImage;
     private ProgressDialog loadingBar;
 
@@ -67,11 +65,11 @@ public class SetupActivity extends AppCompatActivity {
         UserName = (EditText) findViewById(R.id.setup_username);
         FullName = (EditText) findViewById(R.id.setup_full_name);
         CountryName = (EditText) findViewById(R.id.setup_country_name);
-        SaveInformationbutton = (Button) findViewById(R.id.setup_information_button);
+        SaveInformationbuttion = (Button) findViewById(R.id.setup_information_button);
         ProfileImage = (CircleImageView) findViewById(R.id.setup_profile_image);
         loadingBar = new ProgressDialog(this);
 
-        SaveInformationbutton.setOnClickListener(new View.OnClickListener() {
+        SaveInformationbuttion.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
 
@@ -149,39 +147,41 @@ public class SetupActivity extends AppCompatActivity {
 
                 Uri resultUri = result.getUri();
 
-                final StorageReference filePath = UserProfileImageRef.child(currentUserID + ".jpg");
+                StorageReference filePath = UserProfileImageRef.child(currentUserID + ".jpg");
 
-                filePath.putFile(resultUri).addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
+                filePath.putFile(resultUri).addOnCompleteListener(new OnCompleteListener<UploadTask.TaskSnapshot>() {
                     @Override
-                    public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
-                        filePath.getDownloadUrl().addOnSuccessListener(new OnSuccessListener<Uri>() {
-                            @Override
-                            public void onSuccess(Uri uri) {
-                                final String downloadUrl = uri.toString();
-                                UsersRef.child("profileimage").setValue(downloadUrl).addOnCompleteListener(new OnCompleteListener<Void>() {
-                                    @Override
-                                    public void onComplete(@NonNull Task<Void> task) {
-                                        if(task.isSuccessful()){
+                    public void onComplete(@NonNull final Task<UploadTask.TaskSnapshot> task)
+                    {
+                        if(task.isSuccessful())
+                        {
+                            Toast.makeText(SetupActivity.this, "Profile Image stored successfully to Firebase storage...", Toast.LENGTH_SHORT).show();
 
+                            final String downloadUrl = task.getResult().getMetadata().toString();
 
-                                            Intent selfIntent = new Intent(SetupActivity.this, SetupActivity.class);
-                                            startActivity(selfIntent);
-                                            Toast.makeText(SetupActivity.this, "Image Stored", Toast.LENGTH_SHORT).show();
-                                            loadingBar.dismiss();
+                            UsersRef.child("profileimage").setValue(downloadUrl)
+                                    .addOnCompleteListener(new OnCompleteListener<Void>() {
+                                        @Override
+                                        public void onComplete(@NonNull Task<Void> task)
+                                        {
+                                            if(task.isSuccessful())
+                                            {
+                                                Intent selfIntent = new Intent(SetupActivity.this, SetupActivity.class);
+                                                startActivity(selfIntent);
+
+                                                Toast.makeText(SetupActivity.this, "Profile Image stored to Firebase Database Successfully...", Toast.LENGTH_SHORT).show();
+                                                loadingBar.dismiss();
+                                            }
+                                            else
+                                            {
+                                                String message = task.getException().getMessage();
+                                                Toast.makeText(SetupActivity.this, "Error Occured: " + message, Toast.LENGTH_SHORT).show();
+                                                loadingBar.dismiss();
+                                            }
                                         }
-                                        else {
-                                            String message = task.getException().getMessage();
-                                            Toast.makeText(SetupActivity.this, "Error:" + message, Toast.LENGTH_SHORT).show();
-                                            loadingBar.dismiss();
-                                        }
-                                    }
-                                });
-                            }
-
-                        });
-
+                                    });
+                        }
                     }
-
                 });
             }
             else
@@ -193,8 +193,9 @@ public class SetupActivity extends AppCompatActivity {
     }
 
 
-    private void SaveAccountSetupInformation() {
 
+    private void SaveAccountSetupInformation()
+    {
         String username = UserName.getText().toString();
         String fullname = FullName.getText().toString();
         String country = CountryName.getText().toString();
@@ -214,51 +215,46 @@ public class SetupActivity extends AppCompatActivity {
         else
         {
             loadingBar.setTitle("Saving Information");
-            loadingBar.setMessage("Please wait we are creating your new account");
+            loadingBar.setMessage("Please wait, while we are creating your new Account...");
             loadingBar.show();
             loadingBar.setCanceledOnTouchOutside(true);
 
-
             HashMap userMap = new HashMap();
-            userMap.put("username" , username);
-            userMap.put("fullname" , fullname);
-            userMap.put("country" , country);
-            userMap.put("status" , "Hey there");
-            userMap.put("gender" , "none");
-            userMap.put("dob" , "none");
-            userMap.put("relationshipstatus" , "none");
+            userMap.put("username", username);
+            userMap.put("fullname", fullname);
+            userMap.put("country", country);
+            userMap.put("status", "Hey there, i am using Poster Social Network, developed by Coding Cafe.");
+            userMap.put("gender", "none");
+            userMap.put("dob", "none");
+            userMap.put("relationshipstatus", "none");
             UsersRef.updateChildren(userMap).addOnCompleteListener(new OnCompleteListener() {
                 @Override
-                public void onComplete(@NonNull Task task) {
-
+                public void onComplete(@NonNull Task task)
+                {
                     if(task.isSuccessful())
                     {
                         SendUserToMainActivity();
-
-                        Toast.makeText(SetupActivity.this, "your Account is create Successfully.", Toast.LENGTH_LONG).show();
+                        Toast.makeText(SetupActivity.this, "your Account is created Successfully.", Toast.LENGTH_LONG).show();
                         loadingBar.dismiss();
                     }
                     else
                     {
-                        String mesage = task.getException().getMessage();
-                        Toast.makeText(SetupActivity.this, "Error Occurent: " + mesage, Toast.LENGTH_SHORT).show();
+                        String message =  task.getException().getMessage();
+                        Toast.makeText(SetupActivity.this, "Error Occured: " + message, Toast.LENGTH_SHORT).show();
                         loadingBar.dismiss();
                     }
-
                 }
             });
         }
-
-
-
     }
 
-    private void SendUserToMainActivity() {
 
+
+    private void SendUserToMainActivity()
+    {
         Intent mainIntent = new Intent(SetupActivity.this, MainActivity.class);
         mainIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
         startActivity(mainIntent);
         finish();
-
     }
 }

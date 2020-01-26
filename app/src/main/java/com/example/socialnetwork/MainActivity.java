@@ -45,7 +45,7 @@ public class MainActivity extends AppCompatActivity {
     private Toolbar mToolbar;
 
     private CircleImageView NavProfileImage;
-    private TextView NavProfilUsereName;
+    private TextView NavProfileUserName;
     private ImageButton AddNewPostButton;
 
     private FirebaseAuth mAuth;
@@ -92,7 +92,7 @@ public class MainActivity extends AppCompatActivity {
 
         View navViev = navigationView.inflateHeaderView(R.layout.navigation_header);
         NavProfileImage = (CircleImageView) navViev.findViewById(R.id.nav_profile_image);
-        NavProfilUsereName = (TextView) navViev.findViewById(R.id.nav_user_full_name);
+        NavProfileUserName = (TextView) navViev.findViewById(R.id.nav_user_full_name);
 
 
 
@@ -107,7 +107,7 @@ public class MainActivity extends AppCompatActivity {
                     if(dataSnapshot.hasChild("fullname"))
                     {
                         String fullname = dataSnapshot.child("fullname").getValue().toString();
-                        NavProfilUsereName.setText(fullname);
+                        NavProfileUserName.setText(fullname);
                     }
                     if(dataSnapshot.hasChild("profileimage"))
                     {
@@ -158,29 +158,32 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void DisplayAllUsersPosts() {
+
         FirebaseRecyclerOptions<Posts> options=new FirebaseRecyclerOptions.Builder<Posts>().setQuery(PostsRef,Posts.class).build();
-        FirebaseRecyclerAdapter<Posts, PostsViewHolder> firebaseRecyclerAdapter=new FirebaseRecyclerAdapter<Posts, PostsViewHolder>(options) {
+        final FirebaseRecyclerAdapter<Posts, PostsViewHolder> firebaseRecyclerAdapter=new FirebaseRecyclerAdapter<Posts, PostsViewHolder>(options) {
             @Override
-            protected void onBindViewHolder(@NonNull PostsViewHolder viewHolder, int position, @NonNull Posts model) {
-                viewHolder.username.setText(model.getFullname());
-                viewHolder.time.setText(" " +model.getTime());
-                viewHolder.date.setText(" "+model.getDate());
-                viewHolder.description.setText(model.getDescription());
-                Picasso.get().load(model.getProfileimage()).into(viewHolder.user_post_image);
-                Picasso.get().load(model.getPostimage()).into(viewHolder.postImage);
+            protected void onBindViewHolder(@NonNull PostsViewHolder holder, int position, @NonNull Posts model) {
+                holder.username.setText(model.getFullname());
+                holder.time.setText(" " +model.getTime());
+                holder.date.setText(" "+model.getDate());
+                holder.description.setText(model.getDescription());
+                Picasso.get().load(model.getProfileimage()).into(holder.user_post_image);
+                Picasso.get().load(model.getPostimage()).into(holder.postImage);
 
             }
 
             @NonNull
             @Override
             public PostsViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-                View view= LayoutInflater.from(parent.getContext()).inflate(R.layout.all_posts_layout,parent,false);
+                View view=LayoutInflater.from(parent.getContext()).inflate(R.layout.all_posts_layout,parent,false);
                 PostsViewHolder viewHolder=new PostsViewHolder(view);
                 return viewHolder;
             }
         };
-        postList.setAdapter(firebaseRecyclerAdapter);
+
         firebaseRecyclerAdapter.startListening();
+        postList.setAdapter(firebaseRecyclerAdapter);
+
     }
     public static class PostsViewHolder extends RecyclerView.ViewHolder{
         TextView username,date,time,description;
@@ -192,7 +195,7 @@ public class MainActivity extends AppCompatActivity {
             username=itemView.findViewById(R.id.post_user_name);
             date=itemView.findViewById(R.id.post_date);
             time=itemView.findViewById(R.id.post_time);
-            description=itemView.findViewById(R.id.post_descripion);
+            description=itemView.findViewById(R.id.post_description);
             postImage=itemView.findViewById(R.id.post_image);
             user_post_image=itemView.findViewById(R.id.post_profile_image);
         }
