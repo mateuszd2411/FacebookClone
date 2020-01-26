@@ -162,13 +162,28 @@ public class MainActivity extends AppCompatActivity {
         FirebaseRecyclerOptions<Posts> options=new FirebaseRecyclerOptions.Builder<Posts>().setQuery(PostsRef,Posts.class).build();
         final FirebaseRecyclerAdapter<Posts, PostsViewHolder> firebaseRecyclerAdapter=new FirebaseRecyclerAdapter<Posts, PostsViewHolder>(options) {
             @Override
-            protected void onBindViewHolder(@NonNull PostsViewHolder holder, int position, @NonNull Posts model) {
-                holder.username.setText(model.getFullname());
-                holder.time.setText(" " +model.getTime());
-                holder.date.setText(" "+model.getDate());
-                holder.description.setText(model.getDescription());
-                Picasso.get().load(model.getProfileimage()).into(holder.user_post_image);
-                Picasso.get().load(model.getPostimage()).into(holder.postImage);
+            protected void onBindViewHolder(@NonNull PostsViewHolder viewHolder, int position, @NonNull Posts model) {
+
+
+                final String PostKey = getRef(position).getKey();
+
+                viewHolder.username.setText(model.getFullname());
+                viewHolder.time.setText(" " +model.getTime());
+                viewHolder.date.setText(" "+model.getDate());
+                viewHolder.description.setText(model.getDescription());
+                Picasso.get().load(model.getProfileimage()).into(viewHolder.user_post_image);
+                Picasso.get().load(model.getPostimage()).into(viewHolder.postImage);
+
+                viewHolder.itemView.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+
+                        Intent clickPostIntent = new Intent(MainActivity.this, ClickPostActivity.class);
+                        clickPostIntent.putExtra("PostKey", PostKey );
+                        startActivity(clickPostIntent);
+
+                    }
+                });
 
             }
 
@@ -264,6 +279,7 @@ public class MainActivity extends AppCompatActivity {
 
 
     }
+
 
     private void SendUserToLoginActivity() {
 
