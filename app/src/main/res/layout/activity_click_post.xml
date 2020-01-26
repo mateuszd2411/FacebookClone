@@ -11,7 +11,7 @@
 
     <ImageView
         android:id="@+id/click_post_image"
-        android:layout_width="wrap_content"
+        android:layout_width="match_parent"
         android:layout_height="300dp"
         android:layout_marginStart="20dp"
         android:layout_marginTop="20dp"
@@ -25,10 +25,11 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_below="@+id/click_post_image"
-        android:layout_marginLeft="5dp"
+        android:layout_marginLeft="10dp"
         android:layout_marginTop="2dp"
-        android:layout_marginRight="5dp"
-        android:padding="8dp"
+        android:layout_marginRight="10dp"
+        android:padding="15dp"
+        android:background="@drawable/input"
         android:text="Post Description"
         android:textColor="#000000"
         android:textSize="18sp"
