@@ -66,7 +66,7 @@ public class PostActivity extends AppCompatActivity {
 
         PostsImagesRefeence = FirebaseStorage.getInstance().getReference();
         UsersRef = FirebaseDatabase.getInstance().getReference().child("Users");
-        PostRef = FirebaseDatabase.getInstance().getReference().child("Post");
+        PostRef = FirebaseDatabase.getInstance().getReference().child("Posts");
 
 
         SelectPostImage = (ImageButton) findViewById(R.id.select_post_image);

@@ -12,13 +12,18 @@ import androidx.recyclerview.widget.RecyclerView;
 import android.content.Intent;
 import android.os.Build;
 import android.os.Bundle;
+import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.ImageButton;
+import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
 
+import com.firebase.ui.database.FirebaseRecyclerAdapter;
+import com.firebase.ui.database.FirebaseRecyclerOptions;
 import com.google.android.material.navigation.NavigationView;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
@@ -44,7 +49,7 @@ public class MainActivity extends AppCompatActivity {
     private ImageButton AddNewPostButton;
 
     private FirebaseAuth mAuth;
-    private DatabaseReference UsersRef;
+    private DatabaseReference UsersRef, PostsRef;
 
     String currentUserID;
 
@@ -59,6 +64,7 @@ public class MainActivity extends AppCompatActivity {
         mAuth = FirebaseAuth.getInstance();
         currentUserID = mAuth.getCurrentUser().getUid();
         UsersRef = FirebaseDatabase.getInstance().getReference().child("Users");
+        PostsRef = FirebaseDatabase.getInstance().getReference().child("Posts");
 
 
         mToolbar = (Toolbar) findViewById(R.id.main_page_toolbar);
@@ -146,18 +152,53 @@ public class MainActivity extends AppCompatActivity {
         });
 
 
-        DisplayAllUserPosts();
+        DisplayAllUsersPosts();
 
 
     }
 
-    private void DisplayAllUserPosts() {
+    private void DisplayAllUsersPosts() {
+        FirebaseRecyclerOptions<Posts> options=new FirebaseRecyclerOptions.Builder<Posts>().setQuery(PostsRef,Posts.class).build();
+        FirebaseRecyclerAdapter<Posts, PostsViewHolder> firebaseRecyclerAdapter=new FirebaseRecyclerAdapter<Posts, PostsViewHolder>(options) {
+            @Override
+            protected void onBindViewHolder(@NonNull PostsViewHolder viewHolder, int position, @NonNull Posts model) {
+                viewHolder.username.setText(model.getFullname());
+                viewHolder.time.setText(" " +model.getTime());
+                viewHolder.date.setText(" "+model.getDate());
+                viewHolder.description.setText(model.getDescription());
+                Picasso.get().load(model.getProfileimage()).into(viewHolder.user_post_image);
+                Picasso.get().load(model.getPostimage()).into(viewHolder.postImage);
 
+            }
 
-
-
-
+            @NonNull
+            @Override
+            public PostsViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
+                View view= LayoutInflater.from(parent.getContext()).inflate(R.layout.all_posts_layout,parent,false);
+                PostsViewHolder viewHolder=new PostsViewHolder(view);
+                return viewHolder;
+            }
+        };
+        postList.setAdapter(firebaseRecyclerAdapter);
+        firebaseRecyclerAdapter.startListening();
     }
+    public static class PostsViewHolder extends RecyclerView.ViewHolder{
+        TextView username,date,time,description;
+        CircleImageView user_post_image;
+        ImageView postImage;
+        public PostsViewHolder(View itemView) {
+            super(itemView);
+
+            username=itemView.findViewById(R.id.post_user_name);
+            date=itemView.findViewById(R.id.post_date);
+            time=itemView.findViewById(R.id.post_time);
+            description=itemView.findViewById(R.id.post_descripion);
+            postImage=itemView.findViewById(R.id.post_image);
+            user_post_image=itemView.findViewById(R.id.post_profile_image);
+        }
+    }
+
+
 
     private void SendUserToPostActivity() {
 
