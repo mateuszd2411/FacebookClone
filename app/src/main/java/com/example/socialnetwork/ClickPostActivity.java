@@ -1,12 +1,16 @@
 package com.example.socialnetwork;
 
 import androidx.annotation.NonNull;
+import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 
+import android.app.Dialog;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
+import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -71,6 +75,15 @@ public class ClickPostActivity extends AppCompatActivity {
                         DeletePostButton.setVisibility(View.VISIBLE);
                         EditPostButton.setVisibility(View.VISIBLE);
                     }
+
+                    EditPostButton.setOnClickListener(new View.OnClickListener() {
+                        @Override
+                        public void onClick(View v) {
+
+                            EditCurrentPost(description);
+
+                        }
+                    });
                 }
 
             }
@@ -90,6 +103,40 @@ public class ClickPostActivity extends AppCompatActivity {
             }
         });
 
+
+    }
+
+    private void EditCurrentPost(String description) {
+
+        AlertDialog.Builder builder = new AlertDialog.Builder(ClickPostActivity.this);
+        builder.setTitle("Edit Post: ");
+
+        final EditText inputFiled = new EditText(ClickPostActivity.this);
+        inputFiled.setText(description);
+        builder.setView(inputFiled);
+
+        builder.setPositiveButton("Update", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+
+                ClickPostRef.child("description").setValue(inputFiled.getText().toString());
+                Toast.makeText(ClickPostActivity.this, "Post uppdated successfully", Toast.LENGTH_SHORT).show();
+
+            }
+        });
+
+        builder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+
+                dialog.cancel();
+
+            }
+        });
+
+        Dialog dialog = builder.create();
+        dialog.show();
+        dialog.getWindow().setBackgroundDrawableResource(android.R.color.holo_green_dark);
 
     }
 
