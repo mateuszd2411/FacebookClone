@@ -201,11 +201,19 @@ public class MainActivity extends AppCompatActivity {
 
     }
     public static class PostsViewHolder extends RecyclerView.ViewHolder{
+
+        ImageButton LikePostButton, CommentPostButton;
+        TextView DisplayNoOfLikes;
+
         TextView username,date,time,description;
         CircleImageView user_post_image;
         ImageView postImage;
         public PostsViewHolder(View itemView) {
             super(itemView);
+
+            LikePostButton = (ImageButton) itemView.findViewById(R.id.like_button);
+            CommentPostButton = (ImageButton) itemView.findViewById(R.id.comment_button);
+            DisplayNoOfLikes = (TextView) itemView.findViewById(R.id.display_no_of_likes);
 
             username=itemView.findViewById(R.id.post_user_name);
             date=itemView.findViewById(R.id.post_date);
