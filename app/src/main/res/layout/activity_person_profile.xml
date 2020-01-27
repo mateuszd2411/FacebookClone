@@ -54,7 +54,7 @@
                 android:textSize="18sp" />
 
             <TextView
-                android:id="@+id/person_status"
+                android:id="@+id/person_profile_status"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_below="@+id/person_username"
@@ -69,7 +69,7 @@
                 android:id="@+id/person_country"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_below="@+id/person_status"
+                android:layout_below="@+id/person_profile_status"
                 android:layout_marginTop="60dp"
                 android:text="Country "
                 android:textColor="@android:color/white"
