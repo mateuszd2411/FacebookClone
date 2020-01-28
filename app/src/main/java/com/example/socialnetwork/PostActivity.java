@@ -54,6 +54,8 @@ public class PostActivity extends AppCompatActivity
 
     private String saveCurrentDate, saveCurrentTime, postRandomName, downloadUrl, current_user_id;
 
+    private long countPost = 0;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState)
@@ -167,6 +169,28 @@ public class PostActivity extends AppCompatActivity
 
     private void SavingPostInformationToDatabase()
     {
+
+        PostsRef.addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+
+                if(dataSnapshot.exists())
+                {
+                    countPost = dataSnapshot.getChildrenCount();
+                }
+                else
+                {
+                    countPost = 0;
+                }
+
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError) {
+
+            }
+        });
+
         UsersRef.child(current_user_id).addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot)
@@ -184,6 +208,7 @@ public class PostActivity extends AppCompatActivity
                     postsMap.put("postimage", downloadUrl);
                     postsMap.put("profileimage", userProfileImage);
                     postsMap.put("fullname", userFullName);
+                    postsMap.put("counter", countPost);
                     PostsRef.child(current_user_id + postRandomName).updateChildren(postsMap)
                             .addOnCompleteListener(new OnCompleteListener() {
                                 @Override

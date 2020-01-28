@@ -81,14 +81,24 @@ public class FindFirendsActivity extends AppCompatActivity {
                 setQuery(searchPeopleAndFriendsQuery, FindFriends.class).build();
         FirebaseRecyclerAdapter<FindFriends, FindFriendsViewHolder> adapter=new FirebaseRecyclerAdapter<FindFriends, FindFriendsViewHolder>(options) {
             @Override
-            protected void onBindViewHolder(@NonNull FindFriendsViewHolder findFriendsViewHolder, int position, @NonNull FindFriends findFriends) {
+            protected void onBindViewHolder(@NonNull FindFriendsViewHolder viewHolder, final int position, @NonNull FindFriends findFriends) {
                 final String PostKey = getRef(position).getKey();
-                findFriendsViewHolder.setFullname(findFriends.getFullname());
-                findFriendsViewHolder.setStatus(findFriends.getStatus());
-                findFriendsViewHolder.setProfileImage(getApplicationContext(), findFriends.getProfileimage());
+                viewHolder.setFullname(findFriends.getFullname());
+                viewHolder.setStatus(findFriends.getStatus());
+                viewHolder.setProfileImage(getApplicationContext(), findFriends.getProfileimage());
 
+                viewHolder.mView.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        String visit_user_id = getRef(position).getKey();
 
-                findFriendsViewHolder.itemView.setOnClickListener(new View.OnClickListener() {
+                        Intent profileIntent = new Intent(FindFirendsActivity.this, PersonProfileActivity.class);
+                        profileIntent.putExtra("visit_user_id", visit_user_id);
+                        startActivity(profileIntent);
+                    }
+                });
+
+                viewHolder.itemView.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
                         Intent findFriendsIntent = new Intent(FindFirendsActivity.this, FindFirendsActivity.class);
